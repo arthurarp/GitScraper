@@ -18,3 +18,12 @@ class GitController:
           except Exception as err:
             print(err, file=sys.stderr)
             return jsonify({'message': 'Error on getting user followers'}), 404
+
+        @self.app.route('/<username>/following', methods=['GET'])
+        def get_following(username):
+          try:
+            all_following = self.gitService.get_all_following(username)
+            return jsonify(all_following), 200
+          except Exception as err:
+            print(err, file=sys.stderr)
+            return jsonify({'message': 'Error on getting user following'}), 404
