@@ -2,6 +2,7 @@ import sys
 import json
 import requests
 from bs4 import BeautifulSoup
+from functions.graph import Graph
 
 class GitService:
     def __init__(self):
@@ -11,6 +12,7 @@ class GitService:
         suffix = '?tab=followers'
         followers_list = []
         result = requests.get(self.BASE_URL + username + suffix)
+        print(username, ' ', result.status_code, file=sys.stderr)
         html_doc = result.content
         soup = BeautifulSoup(html_doc, 'html.parser')
         followers_list_html = soup.find_all(
@@ -26,6 +28,7 @@ class GitService:
         suffix = '?tab=following'
         following_list = []
         result = requests.get(self.BASE_URL + username + suffix)
+        print(username, ' ', result.status_code, file=sys.stderr)
         html_doc = result.content
         soup = BeautifulSoup(html_doc, 'html.parser')
         following_list_html = soup.find_all(
@@ -40,6 +43,7 @@ class GitService:
     def get_user_info(self, username):
         prefix = 'https://avatars.githubusercontent.com/u/'
         result = requests.get(self.BASE_URL + username)
+        print(username, ' ', result.status_code, file=sys.stderr)
         html_doc = result.content
         soup = BeautifulSoup(html_doc, 'html.parser')
         name_span = soup.find('span', {"class": "p-name vcard-fullname d-block overflow-hidden"})
@@ -57,3 +61,44 @@ class GitService:
             'image': prefix + user_id
         }
         return data
+
+    def search_by_levels(self, graph, users_to_visit_queue, level):
+        while len(users_to_visit_queue) > 0:
+            current_user = users_to_visit_queue.pop()
+            all_followers = self.get_all_followers(current_user)
+            for follower in all_followers:
+                if not graph.vertex_exists(follower):
+                    user_info = self.get_user_info(follower)
+                    graph.add_vertex(
+                        user_info['username'], 
+                        user_info['name'], 
+                        user_info['image'], 
+                    )
+                graph.add_edge(follower, current_user)
+
+            all_following = self.get_all_following(current_user)
+            for following in all_following:
+                if not graph.vertex_exists(following):
+                    user_info = self.get_user_info(following)
+                    graph.add_vertex(
+                        user_info['username'], 
+                        user_info['name'], 
+                        user_info['image'], 
+                    )
+                graph.add_edge(current_user, following)
+        
+            if level > 1:
+                users_to_visit_queue += all_followers + all_following
+                level -= 1
+
+        return graph.get_plot_data()
+    
+    def get_graph(self, username, level):
+        user_info = self.get_user_info(username)
+        print('teste', file=sys.stderr)
+        graph = Graph(user_info)
+        if level == 0:
+            return graph.get_plot_data()
+
+        return self.search_by_levels(graph, [username], level)
+

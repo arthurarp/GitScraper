@@ -36,3 +36,12 @@ class GitController:
           except Exception as err:
             print(err, file=sys.stderr)
             return jsonify({'message': 'Error on getting user info'}), 500
+
+        @self.app.route('/<username>/graph/<level>', methods=['GET'])
+        def get_graph(username, level):
+          try:
+            graph = self.gitService.get_graph(username, int(level))
+            return jsonify(graph), 200
+          except Exception as err:
+            print(err, file=sys.stderr)
+            return jsonify({'message': 'Error on generating graph'}), 500
