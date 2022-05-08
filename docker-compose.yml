@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    build: .
+    ports:
+      - 8000:5000
+    volumes:
+      - .:/app
+    networks:
+      - git-scraper-net
+
+networks:
+  git-scraper-net:
+    name: 'git-scraper-net'
