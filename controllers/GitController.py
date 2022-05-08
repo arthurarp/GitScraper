@@ -17,7 +17,7 @@ class GitController:
             return jsonify(all_followers), 200
           except Exception as err:
             print(err, file=sys.stderr)
-            return jsonify({'message': 'Error on getting user followers'}), 404
+            return jsonify({'message': 'Error on getting user followers'}), 500
 
         @self.app.route('/<username>/following', methods=['GET'])
         def get_following(username):
@@ -26,4 +26,13 @@ class GitController:
             return jsonify(all_following), 200
           except Exception as err:
             print(err, file=sys.stderr)
-            return jsonify({'message': 'Error on getting user following'}), 404
+            return jsonify({'message': 'Error on getting user following'}), 500
+        
+        @self.app.route('/<username>', methods=['GET'])
+        def get_info(username):
+          try:
+            user_info = self.gitService.get_user_info(username)
+            return jsonify(user_info), 200
+          except Exception as err:
+            print(err, file=sys.stderr)
+            return jsonify({'message': 'Error on getting user info'}), 500
