@@ -31,7 +31,7 @@ class GitService:
             "div", 
             {"class": "d-table table-fixed col-12 width-full py-4 border-bottom color-border-muted"}
         )
-        for each_follower in following_list_html:
-            href = each_follower.find_all('a')[0].get('href')
+        for each_following in following_list_html:
+            href = each_following.find_all('a')[0].get('href')
             following_list.append(href.strip('/'))
         return following_list
