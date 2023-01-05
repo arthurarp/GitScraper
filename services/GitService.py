@@ -7,6 +7,7 @@ from functions.graph import Graph
 class GitService:
     def __init__(self):
         self.BASE_URL = 'https://github.com/'
+        self.teste = 123
 
     def get_all_followers(self, username):
         suffix = '?tab=followers'
