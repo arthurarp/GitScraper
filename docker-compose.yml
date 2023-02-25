@@ -10,6 +10,8 @@ services:
       - .:/app
     networks:
       - git-scraper-net
+    env_file:
+      - ./.env
 
   # mongodb:
   #   container_name: mongodb

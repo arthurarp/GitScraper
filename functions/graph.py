@@ -28,12 +28,23 @@ class Graph:
         'id': vertex,
         'name': self.vertexs[vertex]['name'],
         'image': self.vertexs[vertex]['image'],
+        'shape': 'circularImage',
+        'label': ''
       }
-      vertexs_list.append(self.vertexs[vertex])
+      vertexs_list.append(data)
+
+    edges_list = []
+
+    for edge in self.edges:
+      data = {
+        'from': edge[0],
+        'to': edge[1]
+      }
+      edges_list.append(data)
 
     graph = {
-      'vertexs': vertexs_list,
-      'edges': self.edges
+      'nodes': vertexs_list,
+      'edges': edges_list
     }
 
     return graph
