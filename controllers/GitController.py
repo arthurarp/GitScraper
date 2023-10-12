@@ -54,3 +54,16 @@ class GitController:
           except Exception as err:
             print(err, file=sys.stderr)
             return jsonify({'message': 'Error on generating graph'}), 500
+          
+        @self.app.route('/search', methods=['POST'])
+        def search():
+          try:
+            request_data = request.get_json()
+            origin = request_data['origin']
+            destiny = request_data['destiny']
+            graph = request_data['graph']
+            result = self.gitService.separation(origin, destiny, graph)
+            return jsonify(result), 200
+          except Exception as err:
+            print(err, file=sys.stderr)
+            return jsonify({'message': 'Error on searching'}), 500

@@ -71,7 +71,7 @@ class GitService:
         url = 'https://api.github.com/users/{}'.format(username)
         try:
             result = requests.get(url, headers={'Authorization': 'Bearer ' + self.token}).json()
-            print(result, file=sys.stderr)
+            # print(result, file=sys.stderr)
             return {
                 'username': result['login'],
                 'name':  result['name'],
@@ -84,10 +84,54 @@ class GitService:
     def get_graph(self, username, level):
         user_info = self.get_user_info(username)
         if not user_info:
+            print('Error on finding user', file=sys.stderr)
             return None
-        graph = Graph(user_info)
+        graph = Graph()
+        graph.add_vertex(
+            user_info['username'], 
+            user_info['name'], 
+            user_info['image'], 
+        )
         if level == 0:
             return graph.get_plot_data()
 
         return self.search_by_levels(graph, [username], level)
+    
+    def separation(self, origin, destiny, received_graph):
+        origin = origin.lower()
+        destiny = destiny.lower()
+        graph = Graph()
+        for nodes in received_graph['nodes']:
+            graph.add_vertex(nodes['id'].lower(), nodes['name'], nodes['image'])
+
+        for edge in received_graph['edges']:
+            graph.add_edge(edge['from'].lower(), edge['to'].lower())
+
+        result = graph.bfs(origin, destiny)
+
+        result_graph = {
+            'nodes': [],
+            'edges': []
+        }
+        for node in result:
+            info_node = graph.get_vertex(node)
+            result_graph['nodes'].append({
+                'id': info_node['id'],
+                'name': info_node['name'],
+                'image': info_node['image'],
+                'shape': 'circularImage',
+            })
+
+        for i in range(len(result) - 1):
+            info_node_from = graph.get_vertex(result[i])
+            info_node_to = graph.get_vertex(result[i + 1])
+            result_graph['edges'].append({
+                'from': info_node_from['id'],
+                'to': info_node_to['id']
+            })
+
+        return result_graph
+
+
+        
 
